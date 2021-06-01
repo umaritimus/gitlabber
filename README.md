@@ -1,2 +1,3 @@
 # gitlabber
-gitlab bot
+
+Gitlab Bot and API dispatcher
