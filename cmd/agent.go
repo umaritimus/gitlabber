@@ -27,7 +27,7 @@ var agentCmd = &cobra.Command{
 	Short: "Gitlab Bot server",
 	Long:  `Main gitlab api dispatcher service`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("agent called")
+		fmt.Println("gitlabber agent is listening on port", port)
 	},
 }
 
@@ -39,10 +39,6 @@ func init() {
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
 	// agentCmd.PersistentFlags().String("foo", "", "A help for foo")
-	agentCmd.PersistentFlags().Int("port", 443, "Listen port")
-	agentCmd.PersistentFlags().String("token", "", "Gitlab token")
-	agentCmd.PersistentFlags().String("secret", "", "Gitlabber Authentication token")
-	agentCmd.PersistentFlags().Int("apiVersion", 4, "Gitlab api version")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:

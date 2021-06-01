@@ -18,14 +18,23 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
-
-	homedir "github.com/mitchellh/go-homedir"
+	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
 
+const (
+	defaultConfigFilename = ".gitlabber"
+	envPrefix             = "GITLABBER"
+)
+
 var cfgFile string
+var port int
+var token string
+var secret string
+var apiVersion int
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -56,7 +65,11 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.gitlabber.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "./"+defaultConfigFilename+".toml", "config file")
+	rootCmd.PersistentFlags().IntVarP(&port, "port", "p", 443, "Listen port")
+	rootCmd.PersistentFlags().StringVarP(&token, "token", "", "", "Gitlab token")
+	rootCmd.PersistentFlags().StringVarP(&secret, "secret", "", "", "Gitlabber Authentication token")
+	rootCmd.PersistentFlags().IntVarP(&apiVersion, "apiVersion", "v", 4, "Gitlab api version")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
@@ -65,17 +78,15 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
+	viper.SetEnvPrefix(envPrefix)
+
+	// Search for a configuration file in the current directory
+	viper.AddConfigPath(".")
+
 	if cfgFile != "" {
-		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
 	} else {
-		// Find home directory.
-		home, err := homedir.Dir()
-		cobra.CheckErr(err)
-
-		// Search config in home directory with name ".gitlabber" (without extension).
-		viper.AddConfigPath(home)
-		viper.SetConfigName(".gitlabber")
+		viper.SetConfigName(defaultConfigFilename)
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
@@ -84,4 +95,19 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
 	}
+
+	rootCmd.Flags().VisitAll(func(f *pflag.Flag) {
+		// Environment variables can't have dashes in them, so bind them to their equivalent
+		// keys with underscores, e.g. --api-version => %GITLABBER_API_VERSION%
+		if strings.Contains(f.Name, "-") {
+			envVarSuffix := strings.ToUpper(strings.ReplaceAll(f.Name, "-", "_"))
+			viper.BindEnv(f.Name, fmt.Sprintf("%s_%s", envPrefix, envVarSuffix))
+		}
+
+		// Apply the viper config value to the flag when the flag is not set and viper has a value
+		if !f.Changed && viper.IsSet(f.Name) {
+			val := viper.Get(f.Name)
+			rootCmd.Flags().Set(f.Name, fmt.Sprintf("%v", val))
+		}
+	})
 }
