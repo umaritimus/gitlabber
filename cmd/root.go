@@ -35,6 +35,7 @@ var port int
 var token string
 var secret string
 var apiVersion int
+var url string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -65,11 +66,13 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "./"+defaultConfigFilename+".toml", "config file")
-	rootCmd.PersistentFlags().IntVarP(&port, "port", "p", 443, "Listen port")
-	rootCmd.PersistentFlags().StringVarP(&token, "token", "", "", "Gitlab token")
-	rootCmd.PersistentFlags().StringVarP(&secret, "secret", "", "", "Gitlabber Authentication token")
-	rootCmd.PersistentFlags().IntVarP(&apiVersion, "apiVersion", "v", 4, "Gitlab api version")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "./"+defaultConfigFilename+".toml", "Path to the Configuration File [🏁]")
+	rootCmd.PersistentFlags().IntVarP(&port, "port", "p", 443, "Listen port [🏁]")
+	rootCmd.PersistentFlags().StringVarP(&secret, "secret", "", "", "Gitlabber Authentication token [🏁]")
+	rootCmd.PersistentFlags().StringVarP(&url, "url", "", "https://gitlab.com", "Gitlab base url [🏁]")
+	rootCmd.PersistentFlags().IntVarP(&apiVersion, "apiVersion", "v", 4, "Gitlab api version [🏁]")
+	rootCmd.PersistentFlags().StringVarP(&token, "token", "", "", "*Gitlab token [🚩]")
+	rootCmd.MarkPersistentFlagRequired("token")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
