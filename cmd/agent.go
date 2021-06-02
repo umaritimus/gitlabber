@@ -17,8 +17,11 @@ package cmd
 
 import (
 	"fmt"
+	"gitlabber/controller"
+	"net/http"
 
 	guuid "github.com/google/uuid"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -32,8 +35,10 @@ var agentCmd = &cobra.Command{
 		return preinit(cmd)
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("gitlabber agent is listening on port", port)
-		fmt.Println("use the following integration secret:\n\n", secret, "\n\n")
+		controller.InitConfig(cmd)
+		router := controller.Router()
+
+		log.Fatal("Error starting the server: ", http.ListenAndServe(controller.Hostaddress, router))
 	},
 }
 
@@ -53,9 +58,21 @@ func init() {
 
 func preinit(cmd *cobra.Command) error {
 
+	loglevel, _ := cmd.Flags().GetString("logLevel")
+	lvl, err := log.ParseLevel(loglevel)
+
+	if err != nil {
+		log.SetLevel(log.DebugLevel)
+		log.Error(fmt.Errorf("invalid logging level specified %s : %s . Defaulting to 'debug' \n", loglevel, err))
+	} else {
+		log.SetLevel(lvl)
+		log.Debug(fmt.Sprintf("Setting loglevel to '%s'\n", loglevel))
+	}
+
 	secret, _ := cmd.Flags().GetString("secret")
 
 	if secret == "" {
+		log.Debug("Creating new secret")
 		cmd.Flags().Set("secret", fmt.Sprintf("%v", guuid.New()))
 	}
 

@@ -36,6 +36,7 @@ var token string
 var secret string
 var apiVersion int
 var url string
+var logLevel string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -69,6 +70,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "./"+defaultConfigFilename+".toml", "Path to the Configuration File [🏁]")
 	rootCmd.PersistentFlags().IntVarP(&port, "port", "p", 443, "Listen port [🏁]")
 	rootCmd.PersistentFlags().StringVarP(&secret, "secret", "", "", "Gitlabber Authentication token [🏁]")
+	rootCmd.PersistentFlags().StringVarP(&logLevel, "logLevel", "l", "info", "Gitlabber log level [🏁]")
 	rootCmd.PersistentFlags().StringVarP(&url, "url", "", "https://gitlab.com", "Gitlab base url [🏁]")
 	rootCmd.PersistentFlags().IntVarP(&apiVersion, "apiVersion", "v", 4, "Gitlab api version [🏁]")
 	rootCmd.PersistentFlags().StringVarP(&token, "token", "", "", "*Gitlab token [🚩]")
