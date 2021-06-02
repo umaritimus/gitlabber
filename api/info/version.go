@@ -22,11 +22,6 @@ import (
 	"github.com/go-chi/render"
 )
 
-func VersionRouter(r chi.Router) {
-	r.Get("/", GetVersion)
-	r.Post("/", GetVersion)
-}
-
 func GetVersion(w http.ResponseWriter, r *http.Request) {
 	version := r.Context().Value("api.version").(string)
 
@@ -35,6 +30,11 @@ func GetVersion(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.JSON(w, r, api)
+}
+
+func VersionRouter(r chi.Router) {
+	r.Get("/", GetVersion)
+	r.Post("/", GetVersion)
 }
 
 type Api struct {

@@ -27,9 +27,14 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 	case "1":
 		w.Write([]byte(fmt.Sprintf("status : %s", "bad")))
 	case "2":
+		w.Write([]byte(fmt.Sprintf("secret : %s", r.Context().Value("api.secret").(string))))
+	case "3":
+		w.Write([]byte(fmt.Sprintf("token : %s", r.Context().Value("api.token").(string))))
+	case "4":
 		w.Write([]byte(fmt.Sprintf("status : %s", "ok")))
 	default:
-		w.Write([]byte(fmt.Sprintf("status : %s", "bad")))
+		http.Error(w, http.StatusText(403), 403)
+		return
 	}
 }
 

@@ -35,10 +35,10 @@ var agentCmd = &cobra.Command{
 		return preinit(cmd)
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		controller.InitConfig(cmd)
+		bindaddr := controller.InitConfig(cmd)
 		router := controller.Router()
 
-		log.Fatal("Error starting the server: ", http.ListenAndServe(controller.Hostaddress, router))
+		log.Fatal("Error starting the server: ", http.ListenAndServe(bindaddr, router))
 	},
 }
 
