@@ -34,8 +34,9 @@ var cfgFile string
 var port int
 var token string
 var secret string
-var apiVersion int
+var version int
 var url string
+var project string
 var logLevel string
 
 // rootCmd represents the base command when called without any subcommands
@@ -71,8 +72,9 @@ func init() {
 	rootCmd.PersistentFlags().IntVarP(&port, "port", "p", 443, "Listen port [🏁]")
 	rootCmd.PersistentFlags().StringVarP(&secret, "secret", "", "", "Gitlabber Authentication token [🏁]")
 	rootCmd.PersistentFlags().StringVarP(&logLevel, "logLevel", "l", "info", "Gitlabber log level [🏁]")
-	rootCmd.PersistentFlags().StringVarP(&url, "url", "", "https://gitlab.com", "Gitlab base url [🏁]")
-	rootCmd.PersistentFlags().IntVarP(&apiVersion, "apiVersion", "v", 4, "Gitlab api version [🏁]")
+	rootCmd.PersistentFlags().StringVarP(&url, "url", "", "https://gitlab.com/api/v4", "Gitlab api url [🏁]")
+	rootCmd.PersistentFlags().StringVarP(&project, "project", "", "", "*Gitlab project [🏁]")
+	rootCmd.PersistentFlags().IntVarP(&version, "version", "v", 4, "Gitlab api version [🏁]")
 	rootCmd.PersistentFlags().StringVarP(&token, "token", "", "", "*Gitlab token [🚩]")
 	rootCmd.MarkPersistentFlagRequired("token")
 

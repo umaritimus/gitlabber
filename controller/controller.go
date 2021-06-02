@@ -31,9 +31,12 @@ import (
 )
 
 var (
-	secret string
-	port   int
-	token  string
+	secret  string
+	port    int
+	token   string
+	version int
+	url     string
+	project string
 )
 
 func Router() *chi.Mux {
@@ -57,10 +60,12 @@ func Router() *chi.Mux {
 func ApiVersionCtx() func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			version := chi.URLParam(r, "version")
-			r = r.WithContext(context.WithValue(r.Context(), "api.version", version))
+			r = r.WithContext(context.WithValue(r.Context(), "request.api.version", chi.URLParam(r, "version")))
 			r = r.WithContext(context.WithValue(r.Context(), "api.secret", secret))
 			r = r.WithContext(context.WithValue(r.Context(), "api.token", token))
+			r = r.WithContext(context.WithValue(r.Context(), "api.version", version))
+			r = r.WithContext(context.WithValue(r.Context(), "api.url", url))
+			r = r.WithContext(context.WithValue(r.Context(), "api.project", project))
 			next.ServeHTTP(w, r)
 		})
 	}
@@ -70,9 +75,13 @@ func InitConfig(cmd *cobra.Command) string {
 	port, _ = cmd.Flags().GetInt("port")
 	secret, _ = cmd.Flags().GetString("secret")
 	token, _ = cmd.Flags().GetString("token")
+	version, _ = cmd.Flags().GetInt("version")
+	url, _ = cmd.Flags().GetString("url")
+	project, _ = cmd.Flags().GetString("project")
 
 	log.Info(fmt.Sprintf("Listening on port '%d'\n", port))
 	log.Info(fmt.Sprintf("Using secret '%s'\n", secret))
+	log.Info(fmt.Sprintf("Using project url '%s/projects/%s'", url, project))
 
 	return fmt.Sprintf(":%d", port)
 }
